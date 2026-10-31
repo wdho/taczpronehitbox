@@ -4,7 +4,7 @@ Pawn / crawl hitbox fix for Minecraft Forge 1.20.1. It replaces the tiny 0.6-blo
 AABB used while a player is prone with an oriented body box that follows the body, adds a
 front headshot zone, and takes over the vanilla hit tests that otherwise ignore the pose.
 
-> 状态：最终版本 **v1.5.1**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
+> 状态：最终版本 **v1.5.2**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
 
 ## Features
 
@@ -17,7 +17,9 @@ front headshot zone, and takes over the vanilla hit tests that otherwise ignore 
 - **Client debug rendering**: F3+B shows the body box (white) and head zone (red).
 - **Hold-to-crawl**: hold TaCZ's crawl key and the player stays prone (setPose + setForcedPose)
   with a 1.0 step height, so falling, jumping, shooting or stairs cannot cancel the crawl.
-  Release the key to automatically stand up. No extra key is needed; /pronehitbox lock shows the state.
+  Release the key to automatically stand up. TaCZ's own crawl-key toggle/hold handler and
+  tickCrawl cancellation are suspended while held, so there is no double prone animation and
+  no first-person gun shaking. No extra key is needed; /pronehitbox lock shows the state.
 - **Custom prone model renderer** that places the model from the same shape data
   (disabled for non-prone players; vanilla rendering is untouched).
 
@@ -32,7 +34,7 @@ entity. Only hit *tests* are replaced.
 3. Optional: TaCZ 1.1.8+ is needed for the TaCZ bullet path; the vanilla projectile / explosion
    paths and the prone hitbox still work without TaCZ.
 
-Built jar: `dist/taczpronehitbox-1.20.1-1.5.1.jar`.
+Built jar: `dist/taczpronehitbox-1.20.1-1.5.2.jar`.
 
 ## Usage
 
@@ -41,7 +43,7 @@ Built jar: `dist/taczpronehitbox-1.20.1-1.5.1.jar`.
   - `/pronehitbox status`: crawl / shape status;
   - `/pronehitbox shape`: dump the current body box, world AABB and 8 corners to `latest.log`;
   - `/pronehitbox crawl` / `/pronehitbox stand`: force crawl / stand (diagnostics).
-- Hold-to-crawl: hold the TaCZ crawl key (default C in this pack; whatever you bound) while
+- Hold-to-crawl: hold the TaCZ crawl key (default C; if you rebound it, e.g. B, use that key) while
   prone. Step height becomes 1.0 and the prone pose is re-applied every tick, so movement,
   jumping, shooting and stairs keep you prone. Release the key to stand up automatically.
 
@@ -95,7 +97,7 @@ prone hitbox, show mode.
 
 ## Version
 
-Current: **1.5.1** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
+Current: **1.5.2** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
 development log. This repository is public; only the latest release is kept.
 
 ## License
