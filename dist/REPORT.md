@@ -397,3 +397,17 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
 - 修复：客户端 mixin 直接拦截 `LocalPlayerCrawl.crawl(boolean)`（本模组现在用纯姿态锁，
   不需要 TaCZ 的 crawl 状态）；服务端释放时也把 `ShooterDataHolder.isCrawling` 清成 false。
 - 版本 1.5.4，构建成功，自测 677 checks 全过。
+
+
+---
+
+# v1.5.5：趴下判定框在多人/移动时抖动
+
+- 现象：趴下后 F3+B 的框（以及趴下模型）在多人环境/移动时抖动，静止时明显。
+- 根因：调试渲染和模型用的是 `ProneHistory` 的**离散 tick**位置/朝向，而实体渲染本身按
+  partial tick 插值；两者每 tick 对不上，客户端看起来就是框在抖。多人时远端玩家位置/朝向
+  更新频率低，抖动更明显。
+- 修复：新增 `ProneShape.forRender(player, partialTicks)`：位置用 `getPosition(partialTicks)`，
+  朝向用 `Mth.rotLerp(partialTick, yRotO/yBodyRotO, yRot/yBodyRot)`；调试框、模型和青色脚点
+  都改用这个插值 shape。命中判定仍用 tick history 做延迟回退，不受影响。
+- 版本 1.5.5，构建成功，自测 677 checks 全过。
