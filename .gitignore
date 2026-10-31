@@ -1,0 +1,21 @@
+# Gradle caches / build output (local machine only)
+.gradle/
+.gradle-home/
+build/
+/libs/
+# Runtime / test instances / diagnostics (large, machine-specific)
+logs/
+run/
+run-server/
+run-prod-server/
+test-instance/
+evidence/
+install-backup/
+META-INF/
+# IDE
+.idea/
+*.iml
+*.log
+# Release archives: keep only the current dist files, not every old jar
+dist/archive/
+dist/archive-1.0.0/
