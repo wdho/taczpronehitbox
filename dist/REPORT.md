@@ -321,7 +321,7 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   `setMaxUpStep(1.0)`，真正保持趴姿并允许爬 1 格台阶；解锁恢复 `STANDING` / step 0.6。
 - 最终自测：**ALL PASS（677 checks）**；构建成功；JAR 校验 PASS 34 / FAIL 0。
 - 最终 jar：`dist/taczpronehitbox-1.20.1-1.4.11.jar`。
-- 仓库最终状态：公开（public），只保留最新版 1.4.2+；1.4.12 为最终修复。
+- 仓库最终状态：归档（archived）+ 私有（private）。
 
 
 ---
@@ -334,3 +334,22 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   `cir.setReturnValue(...)`，但 `@Inject` 没有声明 `cancellable = true`；在服务器/其他模组
   （Connector/harium 等）同时混入时触发。
 - 修复：给该 `@Inject` 补上 `cancellable = true`；构建/自测通过，版本 1.4.12。
+
+
+---
+
+# v1.5.0：长按爬行（Hold-to-Crawl）
+
+- 按用户要求，把原来的 V 键锁定改成**长按 TaCZ 爬行键**：
+  按住爬行键时每 tick 强制 `setPose(SWIMMING)` + `setForcedPose(SWIMMING)` + `setMaxUpStep(1.0)`，
+  跳跃、下落、开枪、上台阶、TaCZ 自己取消爬行都不会中断；松开按键自动 `setPose(STANDING)`、
+  清除 forced pose、step 恢复 0.6，并通知 TaCZ/服务端 `crawl(false)`。
+- 服务端收到 hold=true 后立即加入 active 并每 tick 维持趴姿；hold=false 时释放。
+- 同时包含 1.4.12 的多人服务器 `ProjectileHitMixin` 崩溃修复。
+- 自测 ALL PASS（677 checks），构建成功，版本 1.5.0。
+
+
+## 1.5.1
+
+- 修复重生/换维度时客户端旧 hold 状态没有通知服务端，导致服务端可能一直保持趴姿的问题：
+  玩家对象变化时主动发送 `ProneLockPacket(false)`。
