@@ -304,3 +304,21 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   可爬 1 格楼梯/方块而不站起来；再次按 V 解锁，step height 恢复 0.6；
 - C2S `ProneLockPacket`（消息 id 1）同步锁定状态，服务端在玩家 tick END 持续维持趴姿（`ProneLockServer` + `ProneLockApplier`）；
 - 新 key 的 lang（zh_cn/en_us）已加；version 1.3.3，自测 612 全过。
+
+
+---
+
+# v1.4.8 - v1.4.11：头部方向对齐 + 趴下锁定修复（最终）
+
+- **1.4.8（GPT 修复）**：头箱方向改到 `+Z` 头端；头箱放进身体箱内部，顶面与身体顶面齐平；
+  `headVerticalOffset` 不再被无条件覆盖；自测覆盖 `+Z` 头 / `-Z` 脚、边界、竖直、`clip` 命中。
+- **1.4.9**：趴下锁定加入服务端/客户端诊断日志；玩家 tick 用 LOWEST 优先级，尽量最后维持姿态。
+- **1.4.10**：锁定键改为原始 `InputEvent.Key` 监听（不再依赖 `KeyMapping.consumeClick()`），
+  避免被其他模组的按键处理吞掉；新增 `/pronehitbox lock` 状态命令与 `lock on|off`。
+- **1.4.11（最终修复）**：日志确认按键/网络都正常，但 `/pronehitbox lock` 显示
+  `pose=STANDING, forced=SWIMMING, step=0.6`——之前只调了 `setForcedPose`，它不改变 `getPose()`，
+  所以人仍站着。现在 `hold()` 同时执行 `setPose(SWIMMING)` + `setForcedPose(SWIMMING)` +
+  `setMaxUpStep(1.0)`，真正保持趴姿并允许爬 1 格台阶；解锁恢复 `STANDING` / step 0.6。
+- 最终自测：**ALL PASS（677 checks）**；构建成功；JAR 校验 PASS 34 / FAIL 0。
+- 最终 jar：`dist/taczpronehitbox-1.20.1-1.4.11.jar`。
+- 仓库最终状态：归档（archived）+ 私有（private）。

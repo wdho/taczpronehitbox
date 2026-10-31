@@ -8,9 +8,11 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.lwjgl.glfw.GLFW;
@@ -52,31 +54,62 @@ public final class ProneLockClient {
         LOGGER.info("[taczpronehitbox] Registered prone lock key (default V).");
     }
 
+    /**
+     * Raw key event fallback. {@code KeyMapping.consumeClick()} can be fragile when several
+     * mods bind the same key or when another handler consumes input first, so the lock key is
+     * matched against the raw GLFW key and the current binding directly.
+     */
     @SubscribeEvent
+    public static void onKeyInput(InputEvent.Key event) {
+        if (event.getAction() != GLFW.GLFW_PRESS || lockKey == null) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen != null || mc.player == null) {
+            return;
+        }
+        if (lockKey.isUnbound() || event.getKey() != lockKey.getKey().getValue()) {
+            return;
+        }
+        toggle(mc.player);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (lockKey != null && lockKey.consumeClick()) {
-            toggle(player);
-        }
         if (player == null) {
             return;
         }
         if (locked) {
             if (!active && ProneLockApplier.isProneNow(player)) {
                 active = true;
+                LOGGER.info("[prone-lock] client became active: pose={}, forced={}, step={}",
+                        player.getPose(), player.getForcedPose(), player.getStepHeight());
             }
             if (active) {
                 ProneLockApplier.hold(player);
+            }
+            if (player.tickCount % 100 == 0) {
+                LOGGER.info("[prone-lock] tick locked={}, active={}, pose={}, forced={}, step={}",
+                        locked, active, player.getPose(), player.getForcedPose(), player.getStepHeight());
             }
         }
     }
 
     private static void toggle(LocalPlayer player) {
-        locked = !locked;
+        setLocked(player, !locked);
+    }
+
+    /** Used by both the key and the /pronehitbox lock command. */
+    public static void setLocked(LocalPlayer player, boolean value) {
+        if (locked == value) {
+            return;
+        }
+        locked = value;
         if (locked) {
             active = player != null && ProneLockApplier.isProneNow(player);
         } else {
@@ -85,11 +118,37 @@ public final class ProneLockClient {
                 ProneLockApplier.release(player);
             }
         }
+        LOGGER.info("[prone-lock] toggle locked={}, proneNow={}, active={}, pose={}, forced={}, step={}",
+                locked, player != null && ProneLockApplier.isProneNow(player), active,
+                player == null ? null : player.getPose(),
+                player == null ? null : player.getForcedPose(),
+                player == null ? null : player.getStepHeight());
         if (player != null) {
             player.displayClientMessage(Component.literal(locked
                     ? "趴下锁定：开（爬楼梯/上下方块保持趴下）"
                     : "趴下锁定：关"), false);
         }
         ProneHitboxNetwork.sendToServer(new ProneLockPacket(locked));
+    }
+
+    public static boolean isLocked() {
+        return locked;
+    }
+
+    public static boolean isActive() {
+        return active;
+    }
+
+    public static String debugStatus() {
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null) {
+            return "locked=" + locked + ", active=" + active + ", player=null";
+        }
+        return "locked=" + locked + ", active=" + active
+                + ", pose=" + player.getPose()
+                + ", forced=" + player.getForcedPose()
+                + ", step=" + player.getStepHeight()
+                + ", proneNow=" + ProneLockApplier.isProneNow(player);
     }
 }

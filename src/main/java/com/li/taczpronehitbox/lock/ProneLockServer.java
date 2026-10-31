@@ -1,6 +1,8 @@
 package com.li.taczpronehitbox.lock;
 
 import net.minecraft.server.level.ServerPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Server-side per-player lock state + tick application. */
 public final class ProneLockServer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger("taczpronehitbox");
     private static final Map<UUID, Boolean> LOCKED = new ConcurrentHashMap<>();
     private static final Set<UUID> ACTIVE = ConcurrentHashMap.newKeySet();
 
@@ -21,6 +24,8 @@ public final class ProneLockServer {
             return;
         }
         UUID id = player.getUUID();
+        LOGGER.info("[prone-lock] server setLocked={} player={} pose={} forced={}",
+                locked, player.getGameProfile().getName(), player.getPose(), player.getForcedPose());
         if (locked) {
             LOCKED.put(id, Boolean.TRUE);
         } else {
@@ -41,6 +46,8 @@ public final class ProneLockServer {
         }
         if (!ACTIVE.contains(id) && ProneLockApplier.isProneNow(player)) {
             ACTIVE.add(id);
+            LOGGER.info("[prone-lock] server became active for {}: pose={}, forced={}, step={}",
+                    player.getGameProfile().getName(), player.getPose(), player.getForcedPose(), player.getStepHeight());
         }
         if (ACTIVE.contains(id)) {
             ProneLockApplier.hold(player);

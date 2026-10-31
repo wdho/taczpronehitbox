@@ -27,7 +27,7 @@ import java.util.List;
  *   <li>the body box keeps its configured size at every yaw and the enclosing AABB
  *       never grows beyond the body diagonal (the classic "sideways hitbox balloons"
  *       bug is impossible here);</li>
- *   <li>the headshot zone is the front 30% of the body;</li>
+ *   <li>the headshot zone is a top-aligned box inside the +Z (head) end of the body;</li>
  *   <li>rays that miss the body return {@code null} (no phantom hits), and grazing
  *       shots just inside the box still hit;</li>
  *   <li>the ping rewind formula is bit-for-bit the one TaCZ uses.</li>
@@ -74,7 +74,7 @@ public final class HitboxSelfTest {
         run("vertical drop hits the body at every yaw", HitboxSelfTest::testVerticalDrop);
         run("horizontal front/rear/side hits at every yaw", HitboxSelfTest::testHorizontalHits);
         run("body/enclosing sizes stay constant (no yaw ballooning)", HitboxSelfTest::testSizes);
-        run("headshot zone is the front part of the body", HitboxSelfTest::testHeadshotZone);
+        run("head box is inside the +Z head end with aligned tops", HitboxSelfTest::testHeadshotZone);
         run("rays that miss return null (no phantom hits)", HitboxSelfTest::testMisses);
         run("grazing / inside-start / degenerate rays", HitboxSelfTest::testEdgeCases);
         run("ping rewind formula matches TaCZ Mth.ceil", HitboxSelfTest::testRewindFormula);
@@ -119,6 +119,7 @@ public final class HitboxSelfTest {
                     shape.toWorld(new Vec3(0.0D, y, HALF_LENGTH + 4.0D)),
                     shape.toWorld(new Vec3(0.0D, y, -(HALF_LENGTH + 4.0D))));
             checkVec("front hit yaw=" + yaw, hitFront, expectedFront);
+            check("front hit is headshot yaw=" + yaw, hitFront != null && shape.isHeadshot(hitFront));
 
             // Rear (feet end) shot: rear face, never a headshot.
             Vec3 expectedRear = shape.toWorld(new Vec3(0.0D, y, -HALF_LENGTH));
@@ -181,36 +182,47 @@ public final class HitboxSelfTest {
     }
 
     private static void testHeadshotZone() {
-        // Filled red head slab ON TOP of the body front, at the head (-Z) end.
-        double headStart = -HALF_LENGTH;
-        double headEnd = -HALF_LENGTH + HEAD_LENGTH;
+        // Filled red head box inside the body's +Z (head) end, with both tops aligned.
+        double headStart = HALF_LENGTH - HEAD_LENGTH;
+        double headEnd = HALF_LENGTH;
         double headHalf = Math.min(HALF_WIDTH, HEAD_WIDTH / 2.0D);
-        double headBottom = BASE_HEIGHT + BODY_HEIGHT;
+        double headBottom = TOP - HEAD_HEIGHT;
         double headY = headBottom + HEAD_HEIGHT / 2.0D;
+        double headMidZ = (headStart + headEnd) / 2.0D;
         for (float yaw : YAWS) {
             ProneShape shape = shapeFor(yaw);
+            AABB headBox = shape.localHeadBox();
+            checkClose("head box min Z yaw=" + yaw, headBox.minZ, headStart);
+            checkClose("head box max Z yaw=" + yaw, headBox.maxZ, headEnd);
+            checkClose("head box min Y yaw=" + yaw, headBox.minY, headBottom);
+            checkClose("head box max Y aligned with body yaw=" + yaw, headBox.maxY, shape.localBox().maxY);
+            check("head box contained in body yaw=" + yaw,
+                    headBox.minX >= shape.localBox().minX && headBox.maxX <= shape.localBox().maxX
+                            && headBox.minY >= shape.localBox().minY && headBox.maxY <= shape.localBox().maxY
+                            && headBox.minZ >= shape.localBox().minZ && headBox.maxZ <= shape.localBox().maxZ);
             check("head centre is headshot yaw=" + yaw,
-                    shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headY, (headStart + headEnd) / 2.0D))));
+                    shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headY, headMidZ))));
             check("head start inside yaw=" + yaw,
                     shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headY, headStart + 1.0E-6D))));
             check("head start outside yaw=" + yaw,
                     !shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headY, headStart - 1.0E-6D))));
             check("head width inside yaw=" + yaw,
-                    shape.isHeadshot(shape.toWorld(new Vec3(headHalf - 1.0E-6D, headY, (headStart + headEnd) / 2.0D))));
+                    shape.isHeadshot(shape.toWorld(new Vec3(headHalf - 1.0E-6D, headY, headMidZ))));
             check("head width outside yaw=" + yaw,
-                    !shape.isHeadshot(shape.toWorld(new Vec3(headHalf + 1.0E-6D, headY, (headStart + headEnd) / 2.0D))));
+                    !shape.isHeadshot(shape.toWorld(new Vec3(headHalf + 1.0E-6D, headY, headMidZ))));
             check("head height inside yaw=" + yaw,
-                    shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headBottom + HEAD_HEIGHT / 2.0D, (headStart + headEnd) / 2.0D))));
+                    shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headY, headMidZ))));
             check("head height outside yaw=" + yaw,
-                    !shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headBottom - 1.0E-3D, (headStart + headEnd) / 2.0D))));
-            check("far end is not headshot yaw=" + yaw,
-                    !shape.isHeadshot(shape.toWorld(new Vec3(0.0D, MID_Y, HALF_LENGTH - 1.0E-3D))));
-            // A bullet can hit the head slab even where the body box does not exist (above the body).
-            double headMidZ = (headStart + headEnd) / 2.0D;
-            Vec3 fromAbove = shape.toWorld(new Vec3(0.0D, headBottom + HEAD_HEIGHT + 2.0D, headMidZ));
-            Vec3 toBelow = shape.toWorld(new Vec3(0.0D, headBottom - 2.0D, headMidZ));
+                    !shape.isHeadshot(shape.toWorld(new Vec3(0.0D, headBottom - 1.0E-3D, headMidZ))));
+            check("feet end is not headshot yaw=" + yaw,
+                    !shape.isHeadshot(shape.toWorld(new Vec3(0.0D, MID_Y, -HALF_LENGTH + 1.0E-3D))));
+            // A downward shot at the actual head end hits the aligned top face as a headshot.
+            Vec3 fromAbove = shape.toWorld(new Vec3(0.0D, TOP + 2.0D, headMidZ));
+            Vec3 toBelow = shape.toWorld(new Vec3(0.0D, BASE_HEIGHT - 2.0D, headMidZ));
             Vec3 headHit = shape.clip(fromAbove, toBelow);
-            check("head slab is hittable above body yaw=" + yaw,
+            checkVec("head top hit position yaw=" + yaw, headHit,
+                    shape.toWorld(new Vec3(0.0D, TOP, headMidZ)));
+            check("head top hit is headshot yaw=" + yaw,
                     headHit != null && shape.isHeadshot(headHit));
         }
     }

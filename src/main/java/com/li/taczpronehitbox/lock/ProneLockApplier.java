@@ -25,6 +25,9 @@ public final class ProneLockApplier {
         if (player == null) {
             return;
         }
+        // setForcedPose only affects dimensions; getPose()/model/hitbox use setPose,
+        // so both must be set. This is what actually keeps the player lying down.
+        player.setPose(Pose.SWIMMING);
         player.setForcedPose(Pose.SWIMMING);
         setStepHeight(player, PRONE_STEP_HEIGHT);
     }
@@ -35,8 +38,9 @@ public final class ProneLockApplier {
             return;
         }
         setStepHeight(player, NORMAL_STEP_HEIGHT);
-        if (player.getForcedPose() == Pose.SWIMMING) {
-            player.setForcedPose(null);
+        player.setForcedPose(null);
+        if (player.getPose() == Pose.SWIMMING) {
+            player.setPose(Pose.STANDING);
         }
     }
 

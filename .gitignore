@@ -18,4 +18,9 @@ META-INF/
 *.log
 # Release archives: keep only the current dist files, not every old jar
 dist/archive/
-dist/archive-1.0.0/
+dist/archive-1.0.0/.git-upload-tmp/
+dist/taczpronehitbox-1.20.1-1.4.8.jar
+dist/taczpronehitbox-1.20.1-1.4.9.jar
+dist/taczpronehitbox-1.20.1-1.4.10.jar
+tools/test_lock_key.ps1
+tools/gh_upload_api.ps1

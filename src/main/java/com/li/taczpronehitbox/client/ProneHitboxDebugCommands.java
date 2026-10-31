@@ -1,6 +1,7 @@
 package com.li.taczpronehitbox.client;
 
 import com.li.taczpronehitbox.config.ProneHitboxConfig;
+import com.li.taczpronehitbox.lock.ProneLockClient;
 import com.li.taczpronehitbox.prone.ProneHistory;
 import com.li.taczpronehitbox.prone.ProneSample;
 import com.li.taczpronehitbox.prone.ProneState;
@@ -64,6 +65,10 @@ public final class ProneHitboxDebugCommands {
     public static void onRegisterCommands(RegisterClientCommandsEvent event) {
         LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal("pronehitbox")
                 .then(Commands.literal("status").executes(ctx -> status()))
+                .then(Commands.literal("lock")
+                        .executes(ctx -> lockStatus())
+                        .then(Commands.literal("on").executes(ctx -> lockSet(true)))
+                        .then(Commands.literal("off").executes(ctx -> lockSet(false))))
                 .then(Commands.literal("crawl").executes(ctx -> forceCrawl(true)))
                 .then(Commands.literal("stand").executes(ctx -> forceCrawl(false)))
                 .then(Commands.literal("shape").executes(ctx -> shape()));
@@ -152,6 +157,27 @@ public final class ProneHitboxDebugCommands {
 
     private static String fmt(Vec3 vec) {
         return "(" + fmt(vec.x) + ", " + fmt(vec.y) + ", " + fmt(vec.z) + ")";
+    }
+
+    private static int lockStatus() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) {
+            return 0;
+        }
+        msg("=== prone lock ===");
+        msg(ProneLockClient.debugStatus());
+        msg("说明：趴下时按 V（默认）切换；/pronehitbox lock on|off 可直接切换。");
+        return 1;
+    }
+
+    private static int lockSet(boolean locked) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) {
+            return 0;
+        }
+        ProneLockClient.setLocked(player, locked);
+        msg("prone lock -> " + locked + " (" + ProneLockClient.debugStatus() + ")");
+        return 1;
     }
 
     private static int status() {

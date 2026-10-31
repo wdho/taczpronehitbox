@@ -103,7 +103,7 @@ public final class ProneShape {
             base = 0.0D;
         }
 
-        // Migrate old small/centred head-box defaults to the on-top slab.
+        // Migrate old small/centred head-box defaults to the reference head box.
         if (Math.abs(headWidth - 0.36D) < 1.0E-6D
                 && Math.abs(headLength - 0.35D) < 1.0E-6D
                 && Math.abs(headHeight - 0.40D) < 1.0E-6D) {
@@ -117,23 +117,19 @@ public final class ProneShape {
             headLength = 0.60D;
             headHeight = 0.30D;
         }
-        // Reference drawing: a filled red head slab sitting ON TOP of the front of the body,
-        // with the 头 arrow pointing at it. Restore that from older full-height values.
-        if (headHeight > 0.35D) {
-            headHeight = 0.30D;
-        }
-        headVerticalOffset = 0.0D;
 
         float yaw = sample.bodyYaw();
         double yawRad = Math.toRadians(yaw);
         Vec3 forward = new Vec3(-Math.sin(yawRad), 0.0D, Math.cos(yawRad));
         Vec3 anchor = sample.pos().add(forward.scale(offset));
-        // Head slab on top of the body front (reference drawing's filled red box).
+        // The model's head is at local +Z. The reference drawing puts the red head box
+        // inside that end of the white body box, with both top faces aligned.
         double clampedHeadHeight = Math.max(0.05D, headHeight);
-        double headBottom = base + height + headVerticalOffset;
+        double headTop = base + height + headVerticalOffset;
+        double headBottom = headTop - clampedHeadHeight;
         return new ProneShape(anchor, yaw, width / 2.0D, height, length / 2.0D, base, offset,
                 Math.min(width / 2.0D, headWidth / 2.0D), Math.min(length, Math.max(0.05D, headLength)),
-                headBottom, headBottom + clampedHeadHeight);
+                headBottom, headTop);
     }
 
     /** The whole-body defaults shipped by 1.2.4-1.2.6 (centre in front of the entity origin). */
@@ -233,13 +229,13 @@ public final class ProneShape {
                 && local.z >= minZ && local.z <= maxZ;
     }
 
-    /** True if the hit point is inside the head slab on top of the body front. */
+    /** True if the hit point is inside the head box at the body's +Z (head) end. */
     public boolean isHeadshot(Vec3 world) {
         Vec3 local = toLocal(world);
         double eps = 1.0E-9D;
         return local.x >= -headHalfWidth - eps && local.x <= headHalfWidth + eps
                 && local.y >= headMinY - eps && local.y <= headMaxY + eps
-                && local.z >= minZ - eps && local.z <= minZ + headLength + eps;
+                && local.z >= maxZ - headLength - eps && local.z <= maxZ + eps;
     }
 
     public Vec3 toLocal(Vec3 world) {
@@ -305,8 +301,9 @@ public final class ProneShape {
         return new AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    /** Local head slab on top of the body front, relative to {@link #anchor()}. */
+    /** Local head box inside the +Z (head) end, relative to {@link #anchor()}. */
     public AABB localHeadBox() {
-        return new AABB(-headHalfWidth, headMinY, minZ, headHalfWidth, headMaxY, minZ + headLength);
+        return new AABB(-headHalfWidth, headMinY, maxZ - headLength,
+                headHalfWidth, headMaxY, maxZ);
     }
 }

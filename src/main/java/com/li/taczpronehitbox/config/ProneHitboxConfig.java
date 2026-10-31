@@ -104,15 +104,16 @@ public final class ProneHitboxConfig {
             headRadius = b.comment("Radius of the spherical headshot zone at the front tip.",
                             "The reference drawing uses a big circle for the head; this is that sphere.")
                     .defineInRange("headRadius", 0.40D, 0.10D, 1.00D);
-            headWidth = b.comment("Deprecated box width (kept for old configs; sphere uses headRadius).")
+            headWidth = b.comment("Width of the head box at the head (+Z) end of the body.")
                     .defineInRange("headWidth", 0.65D, 0.10D, 1.20D);
-            headLength = b.comment("Length (front-to-back) of the headshot box at the front tip.")
+            headLength = b.comment("Length (front-to-back) of the head box at the head (+Z) end.")
                     .defineInRange("headLength", 0.60D, 0.10D, 1.20D);
-            headHeight = b.comment("Height of the head box that sits ON TOP of the front of the body,",
-                            "like the filled red slab in the reference drawing (with 头 pointing at it).")
+            headHeight = b.comment("Height of the head box inside the head end of the body.",
+                            "By default its top face is aligned with the body top, matching the reference drawing.")
                     .defineInRange("headHeight", 0.30D, 0.10D, 1.20D);
-            headVerticalOffset = b.comment("Vertical offset of the head slab relative to the body top.",
-                            "Default -0.15 sinks it halfway into the body so it does not float above the model.")
+            headVerticalOffset = b.comment("Vertical offset of the head box top relative to the body top.",
+                            "0 = top faces aligned and the head box contained in the body;",
+                            "positive raises it, negative lowers it.")
                     .defineInRange("headVerticalOffset", 0.0D, -0.30D, 0.30D);
             headFrontFraction = b.comment("Deprecated: kept only for old config compatibility.",
                             "The headshot zone is now defined by shape.headWidth / shape.headLength.")

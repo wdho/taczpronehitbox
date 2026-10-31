@@ -4,7 +4,7 @@ Pawn / crawl hitbox fix for Minecraft Forge 1.20.1. It replaces the tiny 0.6-blo
 AABB used while a player is prone with an oriented body box that follows the body, adds a
 front headshot zone, and takes over the vanilla hit tests that otherwise ignore the pose.
 
-> 状态：实验性项目，**v1.4.7**。模型/判定箱的视觉对齐仍在调整中，头箱位置以游戏内 F3+B 实测为准。
+> 状态：最终版本 **v1.4.11**（已封存/私有）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
 
 ## Features
 
@@ -16,8 +16,9 @@ front headshot zone, and takes over the vanilla hit tests that otherwise ignore 
 - **Explosion visibility** sampling uses the body box corners instead of the vanilla AABB.
 - **Client debug rendering**: F3+B shows the body box (white) and head zone (red).
 - **Prone lock key**: default **V**, configurable in Controls -> "TaCZ Prone Hitbox".
-  While locked and already prone, the player keeps the prone pose and gets a 1.0 step height,
-  so stairs / single blocks can be climbed without standing up. Press V again to unlock.
+  While locked and already prone, the player keeps the prone pose (setPose + setForcedPose)
+  and gets a 1.0 step height, so stairs / single blocks can be climbed without standing up.
+  Press V again to unlock; /pronehitbox lock prints the current lock state.
 - **Custom prone model renderer** that places the model from the same shape data
   (disabled for non-prone players; vanilla rendering is untouched).
 
@@ -32,7 +33,7 @@ entity. Only hit *tests* are replaced.
 3. Optional: TaCZ 1.1.8+ is needed for the TaCZ bullet path; the vanilla projectile / explosion
    paths and the prone hitbox still work without TaCZ.
 
-Built jar: `dist/taczpronehitbox-1.20.1-1.4.7.jar`.
+Built jar: `dist/taczpronehitbox-1.20.1-1.4.11.jar`.
 
 ## Usage
 
@@ -94,8 +95,8 @@ prone hitbox, show mode.
 
 ## Version
 
-Current: **1.4.7** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
-development log. This repository is public for now; it may be made private later.
+Current: **1.4.11** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
+development log. This repository is archived and private as the final snapshot.
 
 ## License
 
