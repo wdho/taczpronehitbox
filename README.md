@@ -101,3 +101,11 @@ development log. This repository is archived and private as the final snapshot.
 ## License
 
 No license file yet. Ask the repository owner before redistributing.
+
+## AI 声明 / AI Notice
+
+本项目的代码、文档与测试由 AI 辅助生成/修改（AI-assisted）。发布者已进行构建与实机验证；内容按“现状”提供，不保证适用性，使用前请自行评估。
+
+This project was built with AI assistance (AI-assisted). Code, docs and tests may include AI-generated content. Provided "as is"; evaluate before use.
+
+GitHub topics: `ai-assisted`.
