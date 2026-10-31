@@ -353,3 +353,19 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
 
 - 修复重生/换维度时客户端旧 hold 状态没有通知服务端，导致服务端可能一直保持趴姿的问题：
   玩家对象变化时主动发送 `ProneLockPacket(false)`。
+
+
+---
+
+# v1.5.2：长按爬行与 TaCZ 的兼容修正
+
+- 双击/双动画根因：TaCZ 自己的 `CrawlKey.onCrawlPress` 和本模组的 hold 同时调用 `crawl(true)`，
+  导致一次按键触发两次趴下动画。1.5.2 在客户端 mixin 取消 TaCZ 的爬行键处理，
+  由本模组统一按“按住=爬行、松开=站立”驱动。
+- 枪身抖动根因：长按期间跳跃时 TaCZ `LocalPlayerCrawl.tickCrawl` 会取消 isCrawling，
+  而本模组仍强制 pose，第一人称枪动画在两种状态间反复切换。1.5.2 在长按期间取消
+  `LocalPlayerCrawl.tickCrawl`，并在服务端取消 `LivingEntityCrawl.tickCrawling`，保持状态稳定；
+  hold/release 也改成只在 pose/step 真的不同的时候才写入，避免每 tick 重置动画。
+- 兼容 TaCZ 自带 `HOLD_TO_CRAWL`：统一由本模组接管，长按爬行键不会再出现 TaCZ 单次切换
+  与本模组 hold 同时生效的问题；松开自动站起。
+- 版本 1.5.2，自测 677 checks 全过；构建成功。
