@@ -386,3 +386,14 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   防止 TaCZ 在跳跃时把 isCrawling 清掉造成枪身抖动。
 - 新增原始 GLFW 按键状态回退：即使 `KeyMapping.isDown()` 不可靠，也按物理按住/松开驱动。
 - 版本 1.5.3，自测 677 checks 全过，构建成功。
+
+
+## v1.5.4：只有拿枪时卡住的问题
+
+- 现象：空手时长按/二次点按正常，只有手持 TaCZ 枪时第二次点按站不起来。
+- 原因：`CrawlKey.onCrawlPress` 在空手时会直接返回，但拿枪时会真正调用 TaCZ 的
+  `LocalPlayerCrawl.crawl(...)`；即使取消了按键处理，TaCZ 的 `isCrawling` 仍可能保持 true，
+  它的 `tickCrawl` 会继续把 forced pose 设回 SWIMMING，覆盖本模组的站起姿态。
+- 修复：客户端 mixin 直接拦截 `LocalPlayerCrawl.crawl(boolean)`（本模组现在用纯姿态锁，
+  不需要 TaCZ 的 crawl 状态）；服务端释放时也把 `ShooterDataHolder.isCrawling` 清成 false。
+- 版本 1.5.4，构建成功，自测 677 checks 全过。
