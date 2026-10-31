@@ -4,7 +4,7 @@ Pawn / crawl hitbox fix for Minecraft Forge 1.20.1. It replaces the tiny 0.6-blo
 AABB used while a player is prone with an oriented body box that follows the body, adds a
 front headshot zone, and takes over the vanilla hit tests that otherwise ignore the pose.
 
-> 状态：最终版本 **v1.5.4**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
+> 状态：最终版本 **v1.5.5**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
 
 ## Features
 
@@ -14,7 +14,9 @@ front headshot zone, and takes over the vanilla hit tests that otherwise ignore 
 - **Vanilla projectiles** (arrows, throwables, tridents, fishing bobber, ...) go through
   `ProjectileUtil.getEntityHitResult`, so they use the body box too.
 - **Explosion visibility** sampling uses the body box corners instead of the vanilla AABB.
-- **Client debug rendering**: F3+B shows the body box (white) and head zone (red).
+- **Client debug rendering**: F3+B shows the body box (white) and head zone (red). The box and
+  prone model use the render partial tick for interpolation, so they do not jitter on remote
+  players / while moving.
 - **Hold-to-crawl**: hold TaCZ's crawl key and the player stays prone (setPose + setForcedPose)
   with a 1.0 step height, so falling, jumping, shooting or stairs cannot cancel the crawl.
   Release the key to automatically stand up. The hold works like the old proven pose lock:
@@ -37,7 +39,7 @@ entity. Only hit *tests* are replaced.
 3. Optional: TaCZ 1.1.8+ is needed for the TaCZ bullet path; the vanilla projectile / explosion
    paths and the prone hitbox still work without TaCZ.
 
-Built jar: `dist/taczpronehitbox-1.20.1-1.5.4.jar`.
+Built jar: `dist/taczpronehitbox-1.20.1-1.5.5.jar`.
 
 ## Usage
 
@@ -100,7 +102,7 @@ prone hitbox, show mode.
 
 ## Version
 
-Current: **1.5.4** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
+Current: **1.5.5** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
 development log. This repository is public; only the latest release is kept.
 
 ## License
