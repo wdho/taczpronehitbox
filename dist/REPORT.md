@@ -369,3 +369,20 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
 - 兼容 TaCZ 自带 `HOLD_TO_CRAWL`：统一由本模组接管，长按爬行键不会再出现 TaCZ 单次切换
   与本模组 hold 同时生效的问题；松开自动站起。
 - 版本 1.5.2，自测 677 checks 全过；构建成功。
+
+
+---
+
+# v1.5.3：长按爬行改为纯姿态锁 + 原始按键回退
+
+- 1.5.2 在长按开始/结束分别调用 TaCZ 的 `crawl(true)`/`crawl(false)`。TaCZ 的 `crawl(false)`
+  有 `crawCooldownTicks` 冷却，快速点按第二次时会被拒绝，客户端仍保持 `isCrawling=true`，
+  所以出现“点按爬行后，再点按爬行站不起来”。
+- 1.5.3 改为和之前可用的 V 锁定相同的纯姿态方案：按住时 `setPose(SWIMMING)` +
+  `setForcedPose(SWIMMING)` + step 1.0；松开时 `setPose(STANDING)` + 清除 forced + step 0.6，
+  完全不依赖 TaCZ 的 `crawl(true/false)` 冷却。
+- 继续取消 TaCZ 的 `CrawlKey.onCrawlPress`，避免它和本模组各自触发一次趴下动画；
+  长按期间取消 `LocalPlayerCrawl.tickCrawl`/服务端 `LivingEntityCrawl.tickCrawling`，
+  防止 TaCZ 在跳跃时把 isCrawling 清掉造成枪身抖动。
+- 新增原始 GLFW 按键状态回退：即使 `KeyMapping.isDown()` 不可靠，也按物理按住/松开驱动。
+- 版本 1.5.3，自测 677 checks 全过，构建成功。
