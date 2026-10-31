@@ -322,3 +322,15 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
 - 最终自测：**ALL PASS（677 checks）**；构建成功；JAR 校验 PASS 34 / FAIL 0。
 - 最终 jar：`dist/taczpronehitbox-1.20.1-1.4.11.jar`。
 - 仓库最终状态：归档（archived）+ 私有（private）。
+
+
+---
+
+# v1.4.12：修复多人服务器环境下的弹射物 mixin 崩溃
+
+- 崩溃报告：`crash-2026-10-31_12.01.11-client.txt`，堆栈为
+  `org.spongepowered.asm.mixin.injection.callback.CancellationException: The call m_37287_ is not cancellable.`
+- 原因：`ProjectileHitMixin` 在 `ProjectileUtil.getEntityHitResult` 的 `RETURN` 注入里调用了
+  `cir.setReturnValue(...)`，但 `@Inject` 没有声明 `cancellable = true`；在服务器/其他模组
+  （Connector/harium 等）同时混入时触发。
+- 修复：给该 `@Inject` 补上 `cancellable = true`；构建/自测通过，版本 1.4.12。
