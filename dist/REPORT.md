@@ -321,7 +321,7 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   `setMaxUpStep(1.0)`，真正保持趴姿并允许爬 1 格台阶；解锁恢复 `STANDING` / step 0.6。
 - 最终自测：**ALL PASS（677 checks）**；构建成功；JAR 校验 PASS 34 / FAIL 0。
 - 最终 jar：`dist/taczpronehitbox-1.20.1-1.4.11.jar`。
-- 仓库最终状态：归档（archived）+ 私有（private）。
+- 仓库最终状态：公开（public），只保留最新版 1.4.2+；1.4.12 为最终修复。
 
 
 ---
