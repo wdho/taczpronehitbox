@@ -1,0 +1,106 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+}
+
+version = "${minecraft_version}-${mod_version}"
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+    copyIdeResources = true
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'info'
+            mods {
+                taczpronehitbox {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run-server')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'info'
+            args '--nogui'
+            mods {
+                taczpronehitbox {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(ProcessResources).configureEach {
+    filteringCharset = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    // TaCZ 1.1.8-hotfix2 (Forge 1.20.1) - compile-time only; must be installed at runtime.
+    compileOnly files('libs/tacz-1.20.1-1.1.8-hotfix2.jar')
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties
+    }
+}
+
+tasks.register('selfTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs the prone hitbox geometry self test.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.li.taczpronehitbox.test.HitboxSelfTest'
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'    : mod_name,
+                'Specification-Vendor'   : mod_authors,
+                'Specification-Version'  : '1',
+                'Implementation-Title'   : project.name,
+                'Implementation-Version' : project.version,
+                'Implementation-Vendor'  : mod_authors,
+                // Forge 1.20.1 reads Mixin configs from this manifest attribute.
+                'MixinConfigs'           : mod_id + '.mixins.json',
+        ])
+    }
+}
