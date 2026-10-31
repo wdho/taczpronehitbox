@@ -4,7 +4,7 @@ Pawn / crawl hitbox fix for Minecraft Forge 1.20.1. It replaces the tiny 0.6-blo
 AABB used while a player is prone with an oriented body box that follows the body, adds a
 front headshot zone, and takes over the vanilla hit tests that otherwise ignore the pose.
 
-> 状态：最终版本 **v1.5.3**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
+> 状态：最终版本 **v1.5.4**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
 
 ## Features
 
@@ -19,8 +19,9 @@ front headshot zone, and takes over the vanilla hit tests that otherwise ignore 
   with a 1.0 step height, so falling, jumping, shooting or stairs cannot cancel the crawl.
   Release the key to automatically stand up. The hold works like the old proven pose lock:
   it does not call TaCZ's cooldown-protected crawl(true/false), so the second press always
-  stands up. TaCZ's own crawl-key handler is suspended while held, and raw GLFW key events
-  are tracked as a fallback to KeyMapping.isDown(). No extra key is needed;
+  stands up. TaCZ's own crawl-key handler and client crawl() state changes are suspended
+  (this was the gun-only stuck issue), and raw GLFW key events are tracked as a fallback to
+  KeyMapping.isDown(). No extra key is needed;
   /pronehitbox lock shows the state.
 - **Custom prone model renderer** that places the model from the same shape data
   (disabled for non-prone players; vanilla rendering is untouched).
@@ -36,7 +37,7 @@ entity. Only hit *tests* are replaced.
 3. Optional: TaCZ 1.1.8+ is needed for the TaCZ bullet path; the vanilla projectile / explosion
    paths and the prone hitbox still work without TaCZ.
 
-Built jar: `dist/taczpronehitbox-1.20.1-1.5.3.jar`.
+Built jar: `dist/taczpronehitbox-1.20.1-1.5.4.jar`.
 
 ## Usage
 
@@ -99,7 +100,7 @@ prone hitbox, show mode.
 
 ## Version
 
-Current: **1.5.3** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
+Current: **1.5.4** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
 development log. This repository is public; only the latest release is kept.
 
 ## License
