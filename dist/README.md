@@ -4,7 +4,7 @@ Pawn / crawl hitbox fix for Minecraft Forge 1.20.1. It replaces the tiny 0.6-blo
 AABB used while a player is prone with an oriented body box that follows the body, adds a
 front headshot zone, and takes over the vanilla hit tests that otherwise ignore the pose.
 
-> 状态：最终版本 **v1.5.5**（公开）。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平；详细位置以游戏内 F3+B 为准。
+> 状态：版本 **v1.5.6**（公开）。兼容 **TaCZ 1.1.8 与 1.2.0**；1.2.0 已做启动/进世界实机验证。模型/判定箱已按实机截图对齐，头箱位于身体箱内部前端，顶面与身体顶面齐平。
 
 ## Features
 
@@ -39,7 +39,7 @@ entity. Only hit *tests* are replaced.
 3. Optional: TaCZ 1.1.8+ is needed for the TaCZ bullet path; the vanilla projectile / explosion
    paths and the prone hitbox still work without TaCZ.
 
-Built jar: `dist/taczpronehitbox-1.20.1-1.5.5.jar`.
+Built jar: `dist/taczpronehitbox-1.20.1-1.5.6.jar`.
 
 ## Usage
 
@@ -102,7 +102,7 @@ prone hitbox, show mode.
 
 ## Version
 
-Current: **1.5.5** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
+Current: **1.5.6** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
 development log. This repository is public; only the latest release is kept.
 
 ## License
