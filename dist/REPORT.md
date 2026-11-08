@@ -411,3 +411,20 @@ ProneHistory 用 WeakHashMap + ArrayDeque 存每个玩家的位置/身体朝向�
   朝向用 `Mth.rotLerp(partialTick, yRotO/yBodyRotO, yRot/yBodyRot)`；调试框、模型和青色脚点
   都改用这个插值 shape。命中判定仍用 tick history 做延迟回退，不受影响。
 - 版本 1.5.5，构建成功，自测 677 checks 全过。
+
+
+---
+
+# v1.5.6：兼容 TaCZ 1.2.0
+
+- TaCZ 1.2.0 把 `CrawlKey.onCrawlPress` 从 `(InputEvent.Key)` 改成了无参 `boolean` 方法，
+  旧版客户端 mixin `TaCZCrawlKeyMixin` 按旧签名注入会直接 Mixin apply failed，导致进游戏不兼容。
+- 修复：删除 `TaCZCrawlKeyMixin`（不再注入 TaCZ 的按键方法），改为只拦截版本稳定的
+  `LocalPlayerCrawl.crawl(boolean)`；这样 1.1.8 和 1.2.0 都能加载，且仍然阻止 TaCZ 自己切换爬行。
+- `TaCZCrawlTickMixin` / `LivingEntityCrawlHoldMixin` 在 1.2.0 中方法名未变，继续可用。
+- 适配 1.2.0 新增的子弹过滤：`EntityUtil.isBulletDamageIgnored` 与
+  `AmmoConfig.IGNORE_TEAM_FRIENDLY_FIRE` 用反射兼容；1.1.8 没有这些 API 时自动跳过。
+- 实测：TaCZ 1.2.0 + 本 mod 隔离客户端可进入世界，日志确认 `tacz.EntityUtilMixin`、
+  `client.TaCZCrawlCallMixin`、`client.TaCZCrawlTickMixin`、`tacz.LivingEntityCrawlHoldMixin` 全部注入，
+  无 Mixin apply failed。
+- 版本 1.5.6，自测 677 checks 全过，构建成功。
