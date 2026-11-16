@@ -105,14 +105,16 @@ prone hitbox, show mode.
 Current: **1.5.6** (Forge 1.20.1, TaCZ 1.1.8 hotfix2 tested). See `REPORT.md` for the full
 development log. This repository is public; only the latest release is kept.
 
-## License
+## 声明 / Declaration
 
-No license file yet. Ask the repository owner before redistributing.
+- 维护账号：**wdho**，历史贡献以提交记录为准。项目代码、文档与测试使用 AI 辅助生成或修改；本次声明整理使用 **OpenAI Codex 辅助**。
+- 本项目是非官方 Minecraft Forge / TaCZ 附属模组，与 Mojang Studios、Microsoft、Forge 团队或 TaCZ 开发者无隶属、合作或背书关系。相关名称、商标、代码及资源归各自权利人所有。
+- 本仓库目前未提供许可证文件，不将公开可见解释为授予复制、修改或再分发许可；需要相关授权时请联系权利人。本文不为本项目或第三方内容新增开源许可。
+- 本模组会改变卧姿命中判定及相关玩法，安装与配置应遵守服务器管理规则；不要将其描述为只影响本地外观的工具。
+- 支持版本、构建和实测范围以本文已有记录为准，不承诺全部 TaCZ 版本、模组组合或服务器环境均兼容；使用前保留配置和存档备份。
 
-## AI 声明 / AI Notice
-
-本项目的代码、文档与测试由 AI 辅助生成/修改（AI-assisted）。发布者已进行构建与实机验证；内容按“现状”提供，不保证适用性，使用前请自行评估。
-
-This project was built with AI assistance (AI-assisted). Code, docs and tests may include AI-generated content. Provided "as is"; evaluate before use.
-
-GitHub topics: `ai-assisted`.
+- Maintained under the **wdho** account; historical contributions are recorded in the commit history. Code, documentation and tests use AI assistance; this declaration rewrite used **OpenAI Codex assistance**.
+- This is an unofficial Minecraft Forge / TaCZ addon, not affiliated with, partnered with or endorsed by Mojang Studios, Microsoft, the Forge team or TaCZ developers. Third-party names, trademarks, code and assets remain with their respective owners.
+- No license file is currently provided. Public visibility is not a grant of permission to copy, modify or redistribute; contact the rights holders for permission. This declaration adds no open-source license to this project or third-party material.
+- The mod changes prone hit detection and related gameplay. Installation and configuration must follow server rules; it is not a purely local cosmetic tool.
+- Supported versions and verification are limited to the existing records in this README, not every TaCZ version, mod combination or server environment. Keep configuration and save backups before use.
